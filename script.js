@@ -10,6 +10,9 @@ const gameStatus = {
     currentColumn: 0,
     time: 0,
     wordToGuess: "",
+    plays: 0,
+    wins: 0,
+    tries: 0,
 };
 
 // const gameStructure = {};
@@ -26,6 +29,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function initialize() {
     getRandomWordToGuess();
     eventDelegation();
+    gameStatus.plays++;
 }
 
 function eventDelegation() {
@@ -71,10 +75,18 @@ function submitWord() {
     let word = gameStatus.currentWord;
     if (word.length !== gameConfig.numberOfColumns) {
         // alert la paraula ha de tenir 5 lletres
+        Swal.fire({
+            text: "La paraula ha de tenir 5 lletres",
+            icon: "warning"
+        });
         console.log('la paraula ha de tenir 5 lletres')
         return;
     }
     if (!isValidWord(word)) {
+        Swal.fire({
+            text: "La paraula no existeix al diccionari",
+            icon: "warning"
+        });
         // alert aquesta paraula no existeix
         console.log('aquesta paraula no existeix')
         return;
@@ -86,16 +98,28 @@ function submitWord() {
     // acabar el joc
     if (gameStatus.currentWord === gameStatus.wordToGuess) {
         // alert has guanyat
+        Swal.fire({
+            title: "Enhorabona has guanyat!",
+            text: "Ho has aconseguit amb " + gameStatus.tries + " intents i amb "  + " segons.",
+            icon: "success"
+        });
         console.log("has guanyat");
         gameStatus.status = "won";
+        gameStatus.wins++;
     } else if (gameStatus.currentRow === gameConfig.numberOfRows) {
         // alert has perdut
+        Swal.fire({
+            title: "Llàstima has perdut :(",
+            text: "La pròxima ho aconsegueixes",
+            icon: "error"
+        });
         console.log('has perdut')
         gameStatus.status = "lost";
     }
 
     if (gameStatus.status === "playing") {
         nextRow();
+        
     }
 }
 
@@ -123,7 +147,8 @@ function isValidWord(word) {
 function nextRow() {
     gameStatus.currentRow++;
     gameStatus.currentColumn = 0;
-    gameStatus.currentWord = ""
+    gameStatus.currentWord = "";
+    gameStatus.tries++;
 }
 
 function putLetter(letter) {
@@ -149,7 +174,6 @@ function removeLetter() {
 function getRandomWordToGuess() {
     gameStatus.wordToGuess = dic[Math.floor(Math.random()*dic.length)];
     console.log(gameStatus.wordToGuess);
-
     // emptyWord = "_".repeat(gameStatus.wordToGuess.length);
     // setWordCompleted(emptyWord);
 }
@@ -160,12 +184,6 @@ function isValidLetter(letter) {
 }
 
 // Formulari
-// Comprovar nom
-// Comprovar cognom
-// Comprovar correu
-// Comprovar telefon
-// Finestres formulari
-
 let nom, cognom, email, telefon;
 document.getElementById("submit").addEventListener("click", function(){
     // Comprovar nom
@@ -206,17 +224,45 @@ document.getElementById("submit").addEventListener("click", function(){
         });
     // Si els camps són correctes
     } else {
+        nom = document.getElementById("nom").value;
+        cognom = document.getElementById("cognom").value;
         document.getElementById("form").style.display = "none";
     }
 })
 
+// Finestra info
 document.getElementById("informacio").addEventListener("click", function(){
     Swal.fire({
         title: "Com jugar al WordleIBC?",
         html: 
-            "Endevina el <b>WORDLE</b> en 6 intents. <br><br> Has d'introduir paraules de 5 lletres <ins>que existeixin</ins> i fer clic a ENTER (⏎). <br><br> Després de cada intent, el color de les lletres canviarà per indicar l'evolució de la partida. <br><br> No es tenen en compte els accents a l'hora d'introduir paraules. <br><br> Es poden repetir lletres. <br><br> Exemples: <br><br> <img src='exemple.png' alt='Exemple wordle' style='width:300px;'>  ",
+            "Endevina el <b>WORDLE</b> en 6 intents. <br><br> Has d'introduir paraules de 5 lletres <ins>que existeixin</ins> i fer clic a ENTER (⏎). <br><br>" + 
+            "Després de cada intent, el color de les lletres canviarà per indicar l'evolució de la partida. <br><br>" + 
+            "No es tenen en compte els accents a l'hora d'introduir paraules. <br><br>" + 
+            "Es poden repetir lletres. <br><br> Exemples: <br><br>" + 
+            "<img src='exemple.png' alt='Exemple wordle' style='width:300px;'>  ",
         icon: "warning",
         confirmButtonColor: "#3085d6",
         confirmButtonText: "OK"
       })
+})
+
+// Finestra estadístiques
+document.getElementById("estadistica").addEventListener("click", function(){
+    Swal.fire({
+        html: 
+            "<img src='estadistica.png' style='width:100px'><br><br>" + 
+            "<h1>Estadístiques</h1><br><br>" +
+            "Nom del jugador: " + nom + " " + cognom + "<br></br>" +  
+            "Partides realitzades: " + gameStatus.plays + "<br></br>" +
+            "Partides guanyades: " + gameStatus.wins + "<br></br>" +
+            "Millor partida: " + gameStatus.tries +  " intents<br></br>" +
+            "Partida més ràpida: " ,
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "OK"
+      })
+})
+
+// Reiniciar
+document.getElementById("reiniciar").addEventListener("click", function(){
+    initialize();
 })

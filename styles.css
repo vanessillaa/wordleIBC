@@ -173,63 +173,6 @@ input[type="submit"]:hover {
     background-color: #b0b0b0;
 }
 
-/* Finestres */
-.info {
-    display: none;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color:rgba(0, 0, 0, 0.4);
-    width: 100%;
-    height: 100%;
-    z-index: 10;
-}
-
-.info * {
-    font-family: monospace;
-}
-
-.info > div {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    height: 70%;
-    background-color: #5cb85c;
-    border-radius: 5px;
-}
-
-.info > div > span {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    text-align: center;
-    color: #ffffff;
-    font-size: 5vh;
-}
-
-.info_msg {
-    display: none;
-}
-
-.btn {
-  border: none;
-  padding: 14px 28px;
-  cursor: pointer;
-  border-radius: 5px;
-  background-color: #ff9800;
-  display: block;
-  color: #ffffff;
-  font-size: 5vh;
-  margin: 5vh auto 0 auto;
-}
-
-.btn:hover {background: #e68a00;}
-
 .correct {background-color: #5cb85c !important;}
 .incorrect {background-color: #787c7e !important;}
 .present {background-color: #f0ad4e !important;}

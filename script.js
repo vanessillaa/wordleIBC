@@ -10,20 +10,7 @@ const gameStatus = {
     currentColumn: 0,
     time: 0,
     wordToGuess: "",
-    plays: 0,
-    wins: 0,
-    tries: 0,
 };
-
-let events = {
-    letters: document.getElementById("letters"),
-    keyboard: document.getElementById("keyboard"),
-    info: document.getElementById("info"),
-    start: document.getElementById("start"),
-    restart: document.getElementById("restart"),
-}
-
-let eventHandlers = {}
 
 // const gameStructure = {};
 
@@ -39,7 +26,6 @@ document.addEventListener("DOMContentLoaded", function() {
 function initialize() {
     getRandomWordToGuess();
     eventDelegation();
-    gameStatus.plays++;
 }
 
 function eventDelegation() {
@@ -81,8 +67,6 @@ function eventDelegation() {
     })
 }
 
-function removeEventListeners() {}
-
 function submitWord() {
     let word = gameStatus.currentWord;
     if (word.length !== gameConfig.numberOfColumns) {
@@ -112,12 +96,12 @@ function submitWord() {
         // alert has guanyat
         Swal.fire({
             title: "Enhorabona has guanyat!",
-            text: "Ho has aconseguit amb " + gameStatus.tries + " intents i amb "  + " segons.",
+            text: "Ho has aconseguit amb " +  + " intents i amb "  + " segons.",
             icon: "success"
         });
         console.log("has guanyat");
         gameStatus.status = "won";
-        gameStatus.wins++;
+        var wins = localStorage.getItem("wins") ?? 0;
     } else if (gameStatus.currentRow === gameConfig.numberOfRows) {
         // alert has perdut
         Swal.fire({
@@ -129,15 +113,9 @@ function submitWord() {
         gameStatus.status = "lost";
     }
 
-    if (gameStatus.status !== "playing") {
-        gameStatus.time = performance.now() / 1000;
-        console.log("temps de partida en segons" + gameStatus.time);
-    }
-
     if (gameStatus.status === "playing") {
         nextRow();
-    } else {
-        // finish game
+        
     }
 }
 
@@ -158,21 +136,6 @@ function checkLetters() {
 
 }
 
-function getLetterColor(letter, index) {
-    let isCorrectLetter = gameStatus.wordToGuess.includes(letter);
-    if (!isCorrectLetter) {
-        return 'incorrect';
-    }
-
-    let wordToGuessLetter = gameStatus.wordToGuess.charAt(index);
-    let isCorrectPosition = letter === wordToGuessLetter;
-    if (isCorrectPosition) {
-        return 'correct';
-    }
-
-    return 'present';
-}
-
 function isValidWord(word) {
     return dic.includes(word);
 }
@@ -181,7 +144,6 @@ function nextRow() {
     gameStatus.currentRow++;
     gameStatus.currentColumn = 0;
     gameStatus.currentWord = "";
-    gameStatus.tries++;
 }
 
 function putLetter(letter) {
@@ -286,9 +248,9 @@ document.getElementById("estadistica").addEventListener("click", function(){
             "<img src='estadistica.png' style='width:100px'><br><br>" + 
             "<h1>Estadístiques</h1><br><br>" +
             "Nom del jugador: " + nom + " " + cognom + "<br></br>" +  
-            "Partides realitzades: " + gameStatus.plays + "<br></br>" +
-            "Partides guanyades: " + gameStatus.wins + "<br></br>" +
-            "Millor partida: " + gameStatus.tries +  " intents<br></br>" +
+            "Partides realitzades: " + + "<br></br>" +
+            "Partides guanyades: " + localStorage.getItem("wins") + "<br></br>" +
+            "Millor partida: " +  +  " intents<br></br>" +
             "Partida més ràpida: " ,
         confirmButtonColor: "#3085d6",
         confirmButtonText: "OK"

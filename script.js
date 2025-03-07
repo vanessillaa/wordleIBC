@@ -18,7 +18,6 @@ let teclat = document.getElementById("teclat");
 let tecles = teclat.querySelectorAll("[data-key]");
 let taulell = document.getElementById("taulell");
 let files = taulell.querySelectorAll(".fila");
-document.getElementById("form").style.display = "none"; // TODO treure
 
 document.addEventListener("DOMContentLoaded", function() {
     initialize();
@@ -83,6 +82,18 @@ function submitWord() {
 
     // check letters
     checkLetters();
+
+    // acabar el joc
+    if (gameStatus.currentWord === gameStatus.wordToGuess) {
+        // alert has guanyat
+        console.log("has guanyat");
+        gameStatus.status = "won";
+    } else if (gameStatus.currentRow === gameConfig.numberOfRows) {
+        // alert has perdut
+        console.log('has perdut')
+        gameStatus.status = "lost";
+    }
+
     if (gameStatus.status === "playing") {
         nextRow();
     }
@@ -103,16 +114,6 @@ function checkLetters() {
         }
     });
 
-    // acabar el joc
-    if (gameStatus.currentWord === gameStatus.wordToGuess) {
-        // alert has guanyat
-        console.log("has guanyat");
-        gameStatus.status = "won";
-    } else if (gameStatus.currentRow === gameConfig.numberOfRows) {
-        // alert has perdut
-        console.log('has perdut')
-        gameStatus.status = "lost";
-    }
 }
 
 function isValidWord(word) {
@@ -144,7 +145,6 @@ function removeLetter() {
         files[gameStatus.currentRow].children[gameStatus.currentColumn].textContent = '';
     }
 }
-var nom, cognom, email, telefon;
 
 function getRandomWordToGuess() {
     gameStatus.wordToGuess = dic[Math.floor(Math.random()*dic.length)];
@@ -165,6 +165,8 @@ function isValidLetter(letter) {
 // Comprovar correu
 // Comprovar telefon
 // Finestres formulari
+
+let nom, cognom, email, telefon;
 document.getElementById("submit").addEventListener("click", function(){
     // Comprovar nom
     if (document.getElementById("nom").value == ""){

@@ -14,6 +14,14 @@ body {
     margin: 0;
     padding: 0;
 }
+
+#joc {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
 .modal {
     position: fixed;
     top: 0;
@@ -100,28 +108,28 @@ input[type="submit"]:hover {
     margin: 0 auto;
 }
 
-#paraules {
+#taulell {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    margin: 20px 0;
 }
 
-#paraules div {
+#taulell div {
     display: flex;
     gap: 5px;
 }
 
-#paraules div div {
+#taulell div div {
     width: 50px;
     height: 50px;
     border: 2px solid #ccc;
     background-color: white;
-    text-align: center;
-    line-height: 50px;
     font-size: 24px;
     font-weight: bold;
     border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #teclat {
@@ -129,7 +137,6 @@ input[type="submit"]:hover {
     grid-template-columns: repeat(10, 1fr);
     gap: 5px;
     max-width: 500px;
-    margin-top: 20px;
 }
 
 #teclat div {
@@ -222,3 +229,9 @@ input[type="submit"]:hover {
 }
 
 .btn:hover {background: #e68a00;}
+
+.correct {background-color: #5cb85c !important;}
+.incorrect {background-color: #787c7e !important;}
+.present {background-color: #f0ad4e !important;}
+
+.correct, .incorrect, .present {color: #ffffff !important;}

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WordleIBC</title>
     <link rel="stylesheet" href="styles.css">
+    <script type="text/javascript" src="diccionari.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
@@ -15,80 +16,81 @@
             <div id="reiniciar">🔄</div>
             <div id="informacio">❓</div>
         </nav>
-        <div id="paraules">
-            <div id="paraula1">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
+        
+        <div id="taulell">
+            <div class="fila">
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
             </div>
-            <div id="paraula2">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
+            <div class="fila">
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
             </div>
-            <div id="paraula3">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
+            <div class="fila">
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
             </div>
-            <div id="paraula4">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
+            <div class="fila">
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
             </div>
-            <div id="paraula5">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
+            <div class="fila">
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
             </div>
-            <div id="paraula6">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
+            <div class="fila">
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
+                <div class="casella"></div>
             </div>
         </div>
         <div id="teclat">
-            <div>Q</div>
-            <div>W</div>
-            <div>E</div>
-            <div>R</div>
-            <div>T</div>
-            <div>Y</div>
-            <div>U</div>
-            <div>I</div>
-            <div>O</div>
-            <div>P</div>
-            <div>A</div>
-            <div>S</div>
-            <div>D</div>
-            <div>F</div>
-            <div>G</div>
-            <div>H</div>
-            <div>J</div>
-            <div>K</div>
-            <div>L</div>
-            <div>Ç</div>
-            <div class="enter">⏎</div>
-            <div>Z</div>
-            <div>X</div>
-            <div>C</div>
-            <div>V</div>
-            <div>B</div>
-            <div>N</div>
-            <div>M</div>
-            <div class="borrar">⌫</div>
+            <div data-key="q">Q</div>
+            <div data-key="w">W</div>
+            <div data-key="e">E</div>
+            <div data-key="r">R</div>
+            <div data-key="t">T</div>
+            <div data-key="y">Y</div>
+            <div data-key="u">U</div>
+            <div data-key="i">I</div>
+            <div data-key="o">O</div>
+            <div data-key="p">P</div>
+            <div data-key="a">A</div>
+            <div data-key="s">S</div>
+            <div data-key="d">D</div>
+            <div data-key="f">F</div>
+            <div data-key="g">G</div>
+            <div data-key="h">H</div>
+            <div data-key="j">J</div>
+            <div data-key="k">K</div>
+            <div data-key="l">L</div>
+            <div data-key="ç">Ç</div>
+            <div class="enter" data-key="enter">⏎</div>
+            <div data-key="z">Z</div>
+            <div data-key="x">X</div>
+            <div data-key="c">C</div>
+            <div data-key="v">V</div>
+            <div data-key="b">B</div>
+            <div data-key="n">N</div>
+            <div data-key="m">M</div>
+            <div class="borrar" data-key="borrar">⌫</div>
         </div>
     </div>
     <!-- Formulari -->
@@ -97,7 +99,7 @@
 
             <form onsubmit="return false;">
                 <h1>WordleIBC</h1>
-                
+
                 <label for="nom"><b>Nom</b></label><br>
                 <input type="text" name="nom" id="nom"><br><br>
                 <label for="cognom"><b>Cognom</b></label><br>

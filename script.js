@@ -12,79 +12,135 @@ const gameStatus = {
     wordToGuess: "",
 };
 
+let gameStats = {
+    gamesPlayed: localStorage.getItem("gamesPlayed") ?? 0,
+    wins: localStorage.getItem("wins") ?? 0,
+    bestGame: localStorage.getItem("bestGame") ?? 0,
+    fastestGame: localStorage.getItem("fastestGame") ?? 0,
+}
+
+let events = {
+    letters: document.getElementById("letters"),
+    // teclat: document.getElementById("teclat"),
+    info: document.getElementById("informacio"),
+    stats: document.getElementById("estadistica"),
+    restart: document.getElementById("reiniciar"),
+    formSubmit: document.getElementById("submit"),
+}
+
+let eventHandlers = {
+    teclesClick: (e) => handleVirtualKeyboard(e.target),
+    keydown: (e) => handleInputLetters(e),
+    restartClick: restart,
+    infoClick: info,
+    statsClick: stats,
+    formSubmitClick: validateForm,
+}
+
 // const gameStructure = {};
 
 let teclat = document.getElementById("teclat");
 let tecles = teclat.querySelectorAll("[data-key]");
 let taulell = document.getElementById("taulell");
 let files = taulell.querySelectorAll(".fila");
+let form = document.getElementById("form");
+// document.getElementById("form").style.display = "none"; // TODO treure
 
 document.addEventListener("DOMContentLoaded", function() {
     initialize();
 });
 
+
+
 function initialize() {
+    getGameStats();
+    if (gameStats.nom == "" || gameStats.cognom == "") {
+        // formulari
+        form.classList.remove('hidden');
+        events.formSubmit.addEventListener("click", eventHandlers.formSubmitClick);
+    } else {
+        startGame();
+    }
+}
+
+function startGame() {
     getRandomWordToGuess();
     eventDelegation();
 }
 
 function eventDelegation() {
-    tecles.forEach(tecla => tecla.addEventListener("click", () => {
-        console.log(tecla);
-        let key = tecla.dataset.key;
-        // check if enter
-        if (key === "enter") {
-            submitWord();
-            console.log('enter')
-        }
-        // check if remove
-        if (key === "borrar") {
-            removeLetter();
-        }
-        // check if letter
-        if (isValidLetter(key)) {
-            console.log(key);
-            putLetter(key)
-        }
-    }));
-
+    // teclat virtual
+    tecles.forEach(tecla => tecla.addEventListener("click", eventHandlers.teclesClick));
     // detectar teclat
-    document.addEventListener("keydown", (e) => {
-        let key = e.key;
-        // check if enter
-        if (key === "Enter") {
-            // check length
-            submitWord();
-        }
-        // heck if remove
-        if (key === "Backspace") {
-            removeLetter();
-        }
-        // check if letter
-        if (isValidLetter(key)) {
-            putLetter(key);
-        }
-    })
+    document.addEventListener("keydown", eventHandlers.keydown);
+    // botons
+    events.restart.addEventListener("click", eventHandlers.restartClick);
+    events.stats.addEventListener("click", eventHandlers.statsClick);
+    events.info.addEventListener("click", eventHandlers.infoClick);
+}
+
+function handleVirtualKeyboard(tecla) {
+    let key = tecla.dataset.key;
+    // submit word
+    if (key === "enter") {
+        submitWord();
+        console.log('enter')
+    }
+    // remove letter
+    if (key === "borrar") {
+        removeLetter();
+    }
+    // check if letter
+    if (isValidLetter(key)) {
+        console.log(key);
+        putLetter(key)
+    }
+}
+
+function handleInputLetters(e) {
+    let key = e.key;
+    // Submit word
+    if (key === "Enter") {
+        submitWord();
+    }
+    // Remove letter
+    if (key === "Backspace") {
+        removeLetter();
+    }
+
+    // Put letter if is valid
+    if (isValidLetter(key)) {
+        putLetter(key);
+    }
+}
+
+function removeEventListeners() {
+    document.removeEventListener("keydown", eventHandlers.keydown);
+    tecles.forEach(tecla => tecla.removeEventListener("click", eventHandlers.teclesClick));
 }
 
 function submitWord() {
     let word = gameStatus.currentWord;
     if (word.length !== gameConfig.numberOfColumns) {
         // alert la paraula ha de tenir 5 lletres
-        Swal.fire({
-            text: "La paraula ha de tenir 5 lletres",
-            icon: "warning"
-        });
-        console.log('la paraula ha de tenir 5 lletres')
+        setTimeout(() => {
+            Swal.fire({
+                text: "La paraula ha de tenir 5 lletres",
+                icon: "warning",
+                heightAuto: false
+            });
+        }, 200);
+
         return;
     }
     if (!isValidWord(word)) {
-        Swal.fire({
-            text: "La paraula no existeix al diccionari",
-            icon: "warning"
-        });
-        // alert aquesta paraula no existeix
-        console.log('aquesta paraula no existeix')
+        setTimeout(() => {
+            Swal.fire({
+                text: "La paraula no existeix al diccionari",
+                icon: "warning",
+                heightAuto: false
+            });
+        }, 200);
         return;
     }
 
@@ -93,47 +149,60 @@ function submitWord() {
 
     // acabar el joc
     if (gameStatus.currentWord === gameStatus.wordToGuess) {
-        // alert has guanyat
-        Swal.fire({
-            title: "Enhorabona has guanyat!",
-            text: "Ho has aconseguit amb " +  + " intents i amb "  + " segons.",
-            icon: "success"
-        });
-        console.log("has guanyat");
+        setTimeout(() => {
+            Swal.fire({
+                title: "Enhorabona has guanyat!",
+                text: "Ho has aconseguit amb " + (gameStatus.currentRow + 1) + " intents i amb " + gameStatus.time  + " segons.",
+                icon: "success",
+                heightAuto: false
+            });
+        }, 200);
+
         gameStatus.status = "won";
-        var wins = localStorage.getItem("wins") ?? 0;
+        localStorage.setItem("wins", gameStats.wins++);
     } else if (gameStatus.currentRow === gameConfig.numberOfRows) {
-        // alert has perdut
-        Swal.fire({
-            title: "Llàstima has perdut :(",
-            text: "La pròxima ho aconsegueixes",
-            icon: "error"
-        });
-        console.log('has perdut')
+        setTimeout(() => {
+            Swal.fire({
+                title: "Llàstima has perdut :(",
+                text: "La pròxima ho aconsegueixes",
+                icon: "error",
+                heightAuto: false
+            });
+        }, 200);
+
         gameStatus.status = "lost";
     }
 
-    if (gameStatus.status === "playing") {
+
+    if (gameStatus.status !== "playing") {
+        removeEventListeners();
+        saveGameStats();
+    } else {
         nextRow();
-        
     }
 }
 
 function checkLetters() {
-    let paraula = gameStatus.wordToGuess.split('');
     let caselles = files[gameStatus.currentRow].querySelectorAll('.casella');
     caselles.forEach((casella, i) => {
         let lletra = casella.textContent.toLowerCase();
-        if (lletra === paraula[i]) {
-            casella.classList.add('correct');
-            paraula[i] = '';
-        } else if (paraula.includes(lletra)) {
-            casella.classList.add('present');
-        } else {
-            casella.classList.add('incorrect');
-        }
+        casella.classList.add(getLetterColor(lletra, i));
     });
 
+}
+
+function getLetterColor(letter, index) {
+    let isCorrectLetter = gameStatus.wordToGuess.includes(letter);
+    if (!isCorrectLetter) {
+        return 'incorrect';
+    }
+
+    let isCorrectPosition = letter === gameStatus.wordToGuess[index];
+    if (isCorrectPosition) {
+        return 'correct';
+    }
+
+    return 'present';
 }
 
 function isValidWord(word) {
@@ -169,8 +238,6 @@ function removeLetter() {
 function getRandomWordToGuess() {
     gameStatus.wordToGuess = dic[Math.floor(Math.random()*dic.length)];
     console.log(gameStatus.wordToGuess);
-    // emptyWord = "_".repeat(gameStatus.wordToGuess.length);
-    // setWordCompleted(emptyWord);
 }
 
 function isValidLetter(letter) {
@@ -179,54 +246,70 @@ function isValidLetter(letter) {
 }
 
 // Formulari
-let nom, cognom, email, telefon;
-document.getElementById("submit").addEventListener("click", function(){
+function validateForm(){
+    let nom = document.getElementById("nom").value;
+    let cognom = document.getElementById("cognom").value;
+    let email = document.getElementById("email").value;
+    let telefon = document.getElementById("telefon").value;
+
     // Comprovar nom
-    if (document.getElementById("nom").value == ""){
+    if (nom == ""){
         Swal.fire({
             text: "Si us plau, no deixis el camp del nom en blanc",
-            icon: "warning"
+            icon: "warning",
+            heightAuto: false
         });
     // Comprovar cognom
-    } else if (document.getElementById("cognom").value == ""){
+    } else if (cognom == ""){
         Swal.fire({
             text: "Si us plau, no deixis el camp del cognom en blanc",
-            icon: "warning"
+            icon: "warning",
+            heightAuto: false
         });
     // Comprovar correu
-    } else if (document.getElementById("email").value == ""){ 
+    } else if (email == ""){
         Swal.fire({
             text: "Si us plau, no deixis el camp del correu en blanc",
-            icon: "warning"
+            icon: "warning",
+            heightAuto: false
         });
     // Comprovar contingut correu
-    } else if (!/^\S+@\S+\.\S+$/.test(document.getElementById("email").value)){ 
+    } else if (!/^\S+@\S+\.\S+$/.test(email)){
         Swal.fire({
             text: "La direcció de correu és incorrecte",
-            icon: "warning"
+            icon: "warning",
+            heightAuto: false
         });
     // Comprovar telefon
-    } else if (document.getElementById("telefon").value == ""){
+    } else if (telefon == ""){
         Swal.fire({
             text: "Si us plau, no deixis el camp del telèfon en blanc",
-            icon: "warning"
+            icon: "warning",
+            heightAuto: false
         });
     // Comprovar contingut telefon
-    } else if (document.getElementById("telefon").value.length != 9 || document.getElementById("telefon").value.isNaN){
+    } else if (telefon.length != 9 || telefon.isNaN){
         Swal.fire({
             text: "El format del telèfon no és correcte",
-            icon: "warning"
+            icon: "warning",
+            heightAuto: false
         });
     // Si els camps són correctes
     } else {
-        nom = document.getElementById("nom").value;
-        cognom = document.getElementById("cognom").value;
-        document.getElementById("form").style.display = "none";
+        // Guardar dades en localStorage
+        localStorage.setItem("nom", nom);
+        localStorage.setItem("cognom", cognom);
+        localStorage.setItem("email", email);
+        localStorage.setItem("telefon", telefon);
+
+        // Ocultar formulari
+        document.getElementById("form").classList.add('hidden');
+        startGame();
     }
-})
+}
 
 // Finestra info
-document.getElementById("informacio").addEventListener("click", function(){
+function info (){
     Swal.fire({
         title: "Com jugar al WordleIBC?",
         html: 
@@ -237,27 +320,63 @@ document.getElementById("informacio").addEventListener("click", function(){
             "<img src='exemple.png' alt='Exemple wordle' style='width:300px;'>  ",
         icon: "warning",
         confirmButtonColor: "#3085d6",
-        confirmButtonText: "OK"
-      })
-})
+        confirmButtonText: "OK",
+        heightAuto: false
+    });
+}
+
+
+function getGameStats() {
+    gameStats = {
+        ...setUserInfo(),
+        gamesPlayed: localStorage.getItem("gamesPlayed") ?? 0,
+        wins: localStorage.getItem("wins") ?? 0,
+        bestGame: localStorage.getItem("bestGame") ?? 0,
+        fastestGame: localStorage.getItem("fastestGame") ?? 0,
+    }
+}
+
+function setUserInfo() {
+    return {
+        nom: localStorage.getItem("nom") ?? "",
+        cognom: localStorage.getItem("cognom") ?? "",
+    }
+}
+
+function saveGameStats() {
+    gameStatus.time = (performance.now() / 1000).toFixed(2);
+    localStorage.setItem("gamesPlayed", gameStats.gamesPlayed + 1);
+    localStorage.setItem("bestGame", gameStats.bestGame > gameStatus.currentRow + 1 ? gameStatus.currentRow + 1 : gameStats.bestGame);
+    localStorage.setItem("fastestGame", gameStats.fastestGame > gameStatus.time ? gameStatus.time : gameStats.fastestGame);
+
+    getGameStats();
+}
 
 // Finestra estadístiques
-document.getElementById("estadistica").addEventListener("click", function(){
+function stats(){
+    let bestGame = gameStats.bestGame + " intents";
+    let fastestGame = gameStats.fastestGame + " segons";
+    if (!gameStats.gamesPlayed) {
+        bestGame = "Cap partida jugada";
+        fastestGame = "Cap partida jugada";
+    }
+
     Swal.fire({
-        html: 
-            "<img src='estadistica.png' style='width:100px'><br><br>" + 
+        html:
+            "<img src='estadistica.png' style='width:100px'><br><br>" +
             "<h1>Estadístiques</h1><br><br>" +
-            "Nom del jugador: " + nom + " " + cognom + "<br></br>" +  
-            "Partides realitzades: " + + "<br></br>" +
-            "Partides guanyades: " + localStorage.getItem("wins") + "<br></br>" +
-            "Millor partida: " +  +  " intents<br></br>" +
-            "Partida més ràpida: " ,
+            "Nom del jugador: " + gameStats.nom + " " + gameStats.cognom + "<br></br>" +
+            "Partides realitzades: " + gameStats.gamesPlayed + "<br></br>" +
+            "Partides guanyades: " + gameStats.wins + "<br></br>" +
+            "Millor partida: " + bestGame +  "<br></br>" +
+            "Partida més ràpida: " + fastestGame,
         confirmButtonColor: "#3085d6",
-        confirmButtonText: "OK"
-      })
-})
+        confirmButtonText: "OK",
+        heightAuto: false
+    });
+}
 
 // Reiniciar
-document.getElementById("reiniciar").addEventListener("click", function(){
-    initialize();
-})
+function restart(){
+    location.reload();
+}

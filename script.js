@@ -15,6 +15,16 @@ const gameStatus = {
     tries: 0,
 };
 
+let events = {
+    letters: document.getElementById("letters"),
+    keyboard: document.getElementById("keyboard"),
+    info: document.getElementById("info"),
+    start: document.getElementById("start"),
+    restart: document.getElementById("restart"),
+}
+
+let eventHandlers = {}
+
 // const gameStructure = {};
 
 let teclat = document.getElementById("teclat");
@@ -71,6 +81,8 @@ function eventDelegation() {
     })
 }
 
+function removeEventListeners() {}
+
 function submitWord() {
     let word = gameStatus.currentWord;
     if (word.length !== gameConfig.numberOfColumns) {
@@ -117,9 +129,15 @@ function submitWord() {
         gameStatus.status = "lost";
     }
 
+    if (gameStatus.status !== "playing") {
+        gameStatus.time = performance.now() / 1000;
+        console.log("temps de partida en segons" + gameStatus.time);
+    }
+
     if (gameStatus.status === "playing") {
         nextRow();
-        
+    } else {
+        // finish game
     }
 }
 
@@ -138,6 +156,21 @@ function checkLetters() {
         }
     });
 
+}
+
+function getLetterColor(letter, index) {
+    let isCorrectLetter = gameStatus.wordToGuess.includes(letter);
+    if (!isCorrectLetter) {
+        return 'incorrect';
+    }
+
+    let wordToGuessLetter = gameStatus.wordToGuess.charAt(index);
+    let isCorrectPosition = letter === wordToGuessLetter;
+    if (isCorrectPosition) {
+        return 'correct';
+    }
+
+    return 'present';
 }
 
 function isValidWord(word) {

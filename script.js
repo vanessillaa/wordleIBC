@@ -12,23 +12,17 @@ const gameStatus = {
     wordToGuess: "",
 };
 
-let gameStats = {
-    gamesPlayed: localStorage.getItem("gamesPlayed") ?? 0,
-    wins: localStorage.getItem("wins") ?? 0,
-    bestGame: localStorage.getItem("bestGame") ?? 0,
-    fastestGame: localStorage.getItem("fastestGame") ?? 0,
-}
+let gameStats = {}
 
-let events = {
+const events = {
     letters: document.getElementById("letters"),
-    // teclat: document.getElementById("teclat"),
     info: document.getElementById("informacio"),
     stats: document.getElementById("estadistica"),
     restart: document.getElementById("reiniciar"),
     formSubmit: document.getElementById("submit"),
 }
 
-let eventHandlers = {
+const eventHandlers = {
     teclesClick: (e) => handleVirtualKeyboard(e.target),
     keydown: (e) => handleInputLetters(e),
     restartClick: restart,
@@ -37,14 +31,11 @@ let eventHandlers = {
     formSubmitClick: validateForm,
 }
 
-// const gameStructure = {};
-
 let teclat = document.getElementById("teclat");
 let tecles = teclat.querySelectorAll("[data-key]");
 let taulell = document.getElementById("taulell");
 let files = taulell.querySelectorAll(".fila");
 let form = document.getElementById("form");
-// document.getElementById("form").style.display = "none"; // TODO treure
 
 document.addEventListener("DOMContentLoaded", function() {
     initialize();
@@ -54,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function initialize() {
     getGameStats();
-    if (gameStats.nom == "" || gameStats.cognom == "") {
+    if (!gameStats.nom.trim() || !gameStats.cognom.trim()) {
         // formulari
         form.classList.remove('hidden');
         events.formSubmit.addEventListener("click", eventHandlers.formSubmitClick);
@@ -71,12 +62,19 @@ function startGame() {
 function eventDelegation() {
     // teclat virtual
     tecles.forEach(tecla => tecla.addEventListener("click", eventHandlers.teclesClick));
+
     // detectar teclat
     document.addEventListener("keydown", eventHandlers.keydown);
+
     // botons
     events.restart.addEventListener("click", eventHandlers.restartClick);
     events.stats.addEventListener("click", eventHandlers.statsClick);
     events.info.addEventListener("click", eventHandlers.infoClick);
+}
+
+function removeEventListeners() {
+    document.removeEventListener("keydown", eventHandlers.keydown);
+    tecles.forEach(tecla => tecla.removeEventListener("click", eventHandlers.teclesClick));
 }
 
 function handleVirtualKeyboard(tecla) {
@@ -84,7 +82,6 @@ function handleVirtualKeyboard(tecla) {
     // submit word
     if (key === "enter") {
         submitWord();
-        console.log('enter')
     }
     // remove letter
     if (key === "borrar") {
@@ -92,7 +89,6 @@ function handleVirtualKeyboard(tecla) {
     }
     // check if letter
     if (isValidLetter(key)) {
-        console.log(key);
         putLetter(key)
     }
 }
@@ -114,11 +110,6 @@ function handleInputLetters(e) {
     }
 }
 
-function removeEventListeners() {
-    document.removeEventListener("keydown", eventHandlers.keydown);
-    tecles.forEach(tecla => tecla.removeEventListener("click", eventHandlers.teclesClick));
-}
-
 function submitWord() {
     let word = gameStatus.currentWord;
     if (word.length !== gameConfig.numberOfColumns) {
@@ -133,6 +124,7 @@ function submitWord() {
 
         return;
     }
+
     if (!isValidWord(word)) {
         setTimeout(() => {
             Swal.fire({
@@ -153,18 +145,21 @@ function submitWord() {
             Swal.fire({
                 title: "Enhorabona has guanyat!",
                 text: "Ho has aconseguit amb " + (gameStatus.currentRow + 1) + " intents i amb " + gameStatus.time  + " segons.",
-                icon: "success",
+                imageUrl: "elmo.webp",
+                imageHeight: 200,
+                imageAlt: "Animació de celebració",
                 heightAuto: false
             });
         }, 200);
 
         gameStatus.status = "won";
-        localStorage.setItem("wins", gameStats.wins++);
+        localStorage.setItem("wins", ++gameStats.wins);
     } else if (gameStatus.currentRow === gameConfig.numberOfRows) {
         setTimeout(() => {
             Swal.fire({
                 title: "Llàstima has perdut :(",
-                text: "La pròxima ho aconsegueixes",
+                html: `La pròxima ho aconsegueixes! <br>
+                       La paraula era: <h2>${gameStatus.wordToGuess}</h2>`,
                 icon: "error",
                 heightAuto: false
             });
@@ -216,9 +211,8 @@ function nextRow() {
 }
 
 function putLetter(letter) {
-    // if is not full
+    // add letter if is not full
     if (gameStatus.currentColumn < gameConfig.numberOfColumns) {
-        // add letter
         gameStatus.currentWord += letter;
         files[gameStatus.currentRow].children[gameStatus.currentColumn].textContent = letter.toUpperCase();
         gameStatus.currentColumn++;
@@ -226,18 +220,18 @@ function putLetter(letter) {
 }
 
 function removeLetter() {
-    // if is not empty
+    // remove letter if is not empty
     if (gameStatus.currentColumn > 0) {
-        // remove letter
         gameStatus.currentColumn--;
         gameStatus.currentWord = gameStatus.currentWord.slice(0, -1);
         files[gameStatus.currentRow].children[gameStatus.currentColumn].textContent = '';
     }
 }
 
+// Genera una paraula aleatòria del diccionari
 function getRandomWordToGuess() {
     gameStatus.wordToGuess = dic[Math.floor(Math.random()*dic.length)];
-    console.log(gameStatus.wordToGuess);
+    console.log(gameStatus.wordToGuess); // Comentar línia si es vol jugar sense veure la paraula
 }
 
 function isValidLetter(letter) {
@@ -253,21 +247,21 @@ function validateForm(){
     let telefon = document.getElementById("telefon").value;
 
     // Comprovar nom
-    if (nom == ""){
+    if (!nom.trim()){
         Swal.fire({
             text: "Si us plau, no deixis el camp del nom en blanc",
             icon: "warning",
             heightAuto: false
         });
     // Comprovar cognom
-    } else if (cognom == ""){
+    } else if (!cognom.trim()){
         Swal.fire({
             text: "Si us plau, no deixis el camp del cognom en blanc",
             icon: "warning",
             heightAuto: false
         });
     // Comprovar correu
-    } else if (email == ""){
+    } else if (!email.trim()){
         Swal.fire({
             text: "Si us plau, no deixis el camp del correu en blanc",
             icon: "warning",
@@ -281,14 +275,14 @@ function validateForm(){
             heightAuto: false
         });
     // Comprovar telefon
-    } else if (telefon == ""){
+    } else if (!telefon.trim()){
         Swal.fire({
             text: "Si us plau, no deixis el camp del telèfon en blanc",
             icon: "warning",
             heightAuto: false
         });
     // Comprovar contingut telefon
-    } else if (telefon.length != 9 || telefon.isNaN){
+    } else if (telefon.length !== 9 || telefon.isNaN){
         Swal.fire({
             text: "El format del telèfon no és correcte",
             icon: "warning",
@@ -329,10 +323,10 @@ function info (){
 function getGameStats() {
     gameStats = {
         ...setUserInfo(),
-        gamesPlayed: localStorage.getItem("gamesPlayed") ?? 0,
-        wins: localStorage.getItem("wins") ?? 0,
-        bestGame: localStorage.getItem("bestGame") ?? 0,
-        fastestGame: localStorage.getItem("fastestGame") ?? 0,
+        gamesPlayed: parseInt(localStorage.getItem("gamesPlayed") ?? 0),
+        wins: parseInt(localStorage.getItem("wins") ?? 0),
+        bestGame: parseInt(localStorage.getItem("bestGame") ?? 0),
+        fastestGame: parseFloat(localStorage.getItem("fastestGame") ?? 0),
     }
 }
 
@@ -345,9 +339,9 @@ function setUserInfo() {
 
 function saveGameStats() {
     gameStatus.time = (performance.now() / 1000).toFixed(2);
-    localStorage.setItem("gamesPlayed", gameStats.gamesPlayed + 1);
-    localStorage.setItem("bestGame", gameStats.bestGame > gameStatus.currentRow + 1 ? gameStatus.currentRow + 1 : gameStats.bestGame);
-    localStorage.setItem("fastestGame", gameStats.fastestGame > gameStatus.time ? gameStatus.time : gameStats.fastestGame);
+    localStorage.setItem("gamesPlayed", ++gameStats.gamesPlayed);
+    localStorage.setItem("bestGame", gameStats.bestGame && gameStats.bestGame < gameStatus.currentRow + 1 ? gameStats.bestGame : gameStatus.currentRow + 1);
+    localStorage.setItem("fastestGame", gameStats.fastestGame && gameStats.fastestGame < gameStatus.time ? gameStats.fastestGame : gameStatus.time);
 
     getGameStats();
 }
